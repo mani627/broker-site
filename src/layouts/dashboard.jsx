@@ -14,6 +14,7 @@ export function Dashboard() {
   const [controller, dispatch] = useMaterialTailwindController();
   const { sidenavType } = controller;
 
+
   return (
     <div className="min-h-screen bg-blue-gray-50/50">
       <Sidenav
@@ -34,6 +35,7 @@ export function Dashboard() {
         >
           <Cog6ToothIcon className="h-5 w-5" />
         </IconButton>
+        {/* wrapping */}
         <Routes>
           {routes.map(
             ({ layout, pages }) =>
@@ -43,6 +45,7 @@ export function Dashboard() {
               ))
           )}
         </Routes>
+          {/* wrapping */}
         <div className="text-blue-gray-600">
           <Footer />
         </div>
