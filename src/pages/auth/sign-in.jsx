@@ -30,7 +30,7 @@ export function SignIn() {
               }}
             />
             <Typography variant="small" color="blue-gray" className="-mb-3 font-medium">
-              Password
+              Passwordsss
             </Typography>
             <Input
               type="password"
@@ -60,12 +60,12 @@ export function SignIn() {
             }
             containerProps={{ className: "-ml-2.5" }}
           />
-          <Button className="mt-6" fullWidth>
+          <Button className="mt-6 bg-primary text-text_primary" fullWidth>
             Sign In
           </Button>
 
           <div className="flex items-center justify-between gap-2 mt-6">
-            <Checkbox
+            {/* <Checkbox
               label={
                 <Typography
                   variant="small"
@@ -76,14 +76,15 @@ export function SignIn() {
                 </Typography>
               }
               containerProps={{ className: "-ml-2.5" }}
-            />
+            /> */}
             <Typography variant="small" className="font-medium text-gray-900">
               <a href="#">
-                Forgot Password
+                Forgot Password ?
               </a>
             </Typography>
           </div>
-          <div className="space-y-4 mt-8">
+          {/* oAuth */}
+          {/* <div className="space-y-4 mt-8">
             <Button size="lg" color="white" className="flex items-center gap-2 justify-center shadow-md" fullWidth>
               <svg width="17" height="16" viewBox="0 0 17 16" fill="none" xmlns="http://www.w3.org/2000/svg">
                 <g clipPath="url(#clip0_1156_824)">
@@ -104,7 +105,7 @@ export function SignIn() {
               <img src="/img/twitter-logo.svg" height={24} width={24} alt="" />
               <span>Sign in With Twitter</span>
             </Button>
-          </div>
+          </div> */}
           <Typography variant="paragraph" className="text-center text-blue-gray-500 font-medium mt-4">
             Not registered?
             <Link to="/auth/sign-up" className="text-gray-900 ml-1">Create account</Link>
@@ -114,8 +115,8 @@ export function SignIn() {
       </div>
       <div className="w-2/5 h-full hidden lg:block">
         <img
-          src="/img/pattern.png"
-          className="h-full w-full object-cover rounded-3xl"
+          src="/img/auth_img.png"
+          className="h-[93vh] w-full object-cover rounded-3xl bg-blue-gray-300"
         />
       </div>
 

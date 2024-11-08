@@ -33,6 +33,28 @@
     <!-- Nepcha is a easy-to-use web analytics. No cookies and fully compliant with GDPR, CCPA and PECR. -->
     <script defer data-site="YOUR_DOMAIN_HERE" src="https://api.nepcha.com/js/nepcha-analytics.js"></script>
   </head>
+  <style>
+    ::-webkit-scrollbar {
+      width: 10px;
+    }
+   html {
+  color: #263238; /* Replace with desired color */
+}
+
+  
+    ::-webkit-scrollbar-track {
+      background: #e2e1e1;
+      border-radius: 10px;
+    }
+    html {
+  scroll-behavior: smooth;
+}
+    ::-webkit-scrollbar-thumb {
+      background: #263238;
+      border-radius: 10px;
+      border: 2px solid #f0f0f0; /* Border for thumb */
+    }
+  </style>
   <body>
     <div id="root"></div>
     <script type="module" src="/src/main.jsx"></script>

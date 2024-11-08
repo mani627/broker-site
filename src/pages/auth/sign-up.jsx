@@ -13,8 +13,8 @@ export function SignUp() {
     <section className="m-8 flex">
             <div className="w-2/5 h-full hidden lg:block">
         <img
-          src="/img/pattern.png"
-          className="h-full w-full object-cover rounded-3xl"
+       src="/img/auth_img.png"
+          className="h-[90vh] w-full object-cover rounded-3xl"
         />
       </div>
       <div className="w-full lg:w-3/5 flex flex-col items-center justify-center">
@@ -54,11 +54,11 @@ export function SignUp() {
             }
             containerProps={{ className: "-ml-2.5" }}
           />
-          <Button className="mt-6" fullWidth>
+          <Button className="mt-6 bg-primary text-text_primary" fullWidth>
             Register Now
           </Button>
 
-          <div className="space-y-4 mt-8">
+          {/* <div className="space-y-4 mt-8">
             <Button size="lg" color="white" className="flex items-center gap-2 justify-center shadow-md" fullWidth>
               <svg width="17" height="16" viewBox="0 0 17 16" fill="none" xmlns="http://www.w3.org/2000/svg">
                 <g clipPath="url(#clip0_1156_824)">
@@ -79,7 +79,7 @@ export function SignUp() {
               <img src="/img/twitter-logo.svg" height={24} width={24} alt="" />
               <span>Sign in With Twitter</span>
             </Button>
-          </div>
+          </div> */}
           <Typography variant="paragraph" className="text-center text-blue-gray-500 font-medium mt-4">
             Already have an account?
             <Link to="/auth/sign-in" className="text-gray-900 ml-1">Sign in</Link>

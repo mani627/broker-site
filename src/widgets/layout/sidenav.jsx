@@ -27,13 +27,20 @@ export function Sidenav({ brandImg, brandName, routes }) {
       <div
         className={`relative`}
       >
-        <Link to="/" className="py-6 px-8 text-center">
-          <Typography
+          <Link to="/" className="py-6 px-8 text-center">
+       <div className="flex justify-center"> <Typography
             variant="h6"
+           style={{letterSpacing:"0.2vh", fontSize:"3.5vh"}}
+           className=" font-normal"
             color={sidenavType === "dark" ? "white" : "blue-gray"}
           >
-            {brandName}
+            
+            {brandName} &nbsp;
           </Typography>
+          <img className=" bg-blue-gray-300 h-[12%] w-[12%]" src="/img/icon_img.gif"/></div>
+      
+     
+         
         </Link>
         <IconButton
           variant="text"
@@ -55,6 +62,7 @@ export function Sidenav({ brandImg, brandName, routes }) {
                   variant="small"
                   color={sidenavType === "dark" ? "white" : "blue-gray"}
                   className="font-black uppercase opacity-75"
+                  
                 >
                   {title}
                 </Typography>
@@ -66,20 +74,28 @@ export function Sidenav({ brandImg, brandName, routes }) {
                   {({ isActive }) => (
                     <Button
                       variant={isActive ? "gradient" : "text"}
-                      color={
+                      // color={
+                      //   isActive
+                      //     ? sidenavColor
+                      //     : sidenavType === "dark"
+                      //     ? "white"
+                      //     : "blue-gray"
+                      // }
+                      color="pink"
+                      className={`${
                         isActive
-                          ? sidenavColor
+                          ? ` `
                           : sidenavType === "dark"
-                          ? "white"
-                          : "blue-gray"
-                      }
-                      className="flex items-center gap-4 px-4 capitalize"
+                          ? "text-white"
+                          : "text-blue-gray-500"
+                      }  bg flex items-center gap-4 px-4 capitalize`}
+                      // className=" "
                       fullWidth
                     >
                       {icon}
                       <Typography
                         color="inherit"
-                        className="font-medium capitalize"
+                        className="font-normal capitalize"
                       >
                         {name}
                       </Typography>
@@ -97,7 +113,7 @@ export function Sidenav({ brandImg, brandName, routes }) {
 
 Sidenav.defaultProps = {
   brandImg: "/img/logo-ct.png",
-  brandName: "Material Tailwind React",
+  brandName: "ShipMacha",
 };
 
 Sidenav.propTypes = {

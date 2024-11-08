@@ -7,20 +7,22 @@ import {
   ServerStackIcon,
   RectangleStackIcon,
 } from "@heroicons/react/24/solid";
-// import { Home, Profile, Tables, Notifications } from "@/pages/dashboard";
-// import { SignIn, SignUp } from "@/pages/auth";
+ import { Home, Profile, Tables, Notifications } from "@/pages/dashboard";
+import { SignIn, SignUp } from "@/pages/auth";
 
 // Lazy-loaded components
-const Home = lazy(() => import("@/pages/dashboard/Home"));
-const Profile = lazy(() => import("@/pages/dashboard/Profile"));
-const Tables = lazy(() => import("@/pages/dashboard/Tables"));
-const Notifications = lazy(() => import("@/pages/dashboard/Notifications"));
-const SignIn = lazy(() => import("@/pages/auth/Sign-in"));
-const SignUp = lazy(() => import("@/pages/auth/Sign-up"));
+// const Home = lazy(() => import("@/pages/dashboard/Home"));
+// const Profile = lazy(() => import("@/pages/dashboard/Profile"));
+// const Tables = lazy(() => import("@/pages/dashboard/Tables"));
+// const Notifications = lazy(() => import("@/pages/dashboard/Notifications"));
+
 
 const icon = {
-  className: "w-5 h-5 text-inherit",
+  className: "w-5 h-5  ",
 };
+const loader=<div class="flex justify-center items-center h-screen">
+<div class="w-16 h-16 border-4 border-blue-500 border-t-transparent rounded-full animate-spin"></div>
+</div>
 
 export const routes = [
   {
@@ -28,12 +30,12 @@ export const routes = [
     pages: [
       {
         icon: <HomeIcon {...icon} />,
-        name: "dashboard",
+        name: "Orders",
         path: "/home",
         element: (
-          <Suspense fallback={<div>Loading...</div>}>
+         // <Suspense fallback={loader}>
             <Home />
-          </Suspense>
+         //  </Suspense>
         ),
       },
       {
@@ -41,9 +43,9 @@ export const routes = [
         name: "profile",
         path: "/profile",
         element: (
-          <Suspense fallback={<div>Loading...</div>}>
+         // <Suspense fallback={loader}>
             <Profile />
-          </Suspense>
+         //  </Suspense>
         ),
       },
       {
@@ -51,9 +53,9 @@ export const routes = [
         name: "tables",
         path: "/tables",
         element: (
-          <Suspense fallback={<div>Loading...</div>}>
+         // <Suspense fallback={loader}>
             <Tables />
-          </Suspense>
+         //  </Suspense>
         ),
       },
       {
@@ -61,9 +63,9 @@ export const routes = [
         name: "notifications",
         path: "/notifications",
         element: (
-          <Suspense fallback={<div>Loading...</div>}>
+         // <Suspense fallback={loader}>
             <Notifications />
-          </Suspense>
+         //  </Suspense>
         ),
       },
     ],
@@ -77,9 +79,9 @@ export const routes = [
         name: "sign in",
         path: "/sign-in",
         element: (
-          <Suspense fallback={<div>Loading...</div>}>
+         
             <SignIn />
-          </Suspense>
+         
         ),
       },
       {
@@ -87,9 +89,9 @@ export const routes = [
         name: "sign up",
         path: "/sign-up",
         element: (
-          <Suspense fallback={<div>Loading...</div>}>
+         
             <SignUp />
-          </Suspense>
+         
         ),
       },
     ],
