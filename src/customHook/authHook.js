@@ -1,4 +1,6 @@
-import { useContext } from "react";
+import {
+  useContext
+} from "react";
 ///import { AuthContext } from "./authContext"; // assume you have an AuthContext for managing auth state
 
 export function useAuth() {

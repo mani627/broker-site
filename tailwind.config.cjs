@@ -5,6 +5,9 @@ module.exports = withMT({
   content: ["./index.html", "./src/**/*.{js,ts,jsx,tsx}"],
   theme: {
     extend: {
+      screens:{
+        'max-md': {'max': '786px'}
+      },
       fontWeight: {
         
         thin: '300',
@@ -26,6 +29,12 @@ module.exports = withMT({
         },
         text_primary:{
             DEFAULT: '#263238'
+        },
+        html_bgColor:{
+         DEFAULT:"#ffffff"
+        },
+        error:{
+          DEFAULT:"#bb1a1c"
         }
       },
     },

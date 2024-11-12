@@ -1,3 +1,6 @@
+import CustomInput from "@/components/CustomInput";
+import { validateInput } from "@/util";
+
 import {
   Card,
   Input,
@@ -5,15 +8,56 @@ import {
   Button,
   Typography,
 } from "@material-tailwind/react";
+import { useState } from "react";
 import { Link } from "react-router-dom";
 
 
 export function SignUp() {
+  const [formValue, setForm] = useState({
+    name: "",
+    companyName: "",
+    phoneNumber: "",
+    emailId: "",
+    password: "",
+    orders: ""
+  })
+
+  const [error, setError] = useState({
+    name: "",
+    companyName: "",
+    phoneNumber: "",
+    emailId: "",
+    password: "",
+    orders: ""
+  })
+
+  const setFormValues = (key, value) => {
+    setForm((prev) => ({
+      ...prev,
+      [key]: value
+    }))
+  }
+
+  const registerNow = (e) => {
+    e.preventDefault();
+    if (document.getElementById("conditions").checked) {
+      setError((prev) => {
+        let result = { ...prev }
+        Object.entries(formValue).forEach(([key, value]) => {
+          result[key] = validateInput(key, value) ? "" : "Invalid Input"
+        });
+        return result
+      })
+    }
+
+  }
+ 
+
   return (
     <section className="m-8 flex">
-            <div className="w-2/5 h-full hidden lg:block">
+      <div className="w-2/5 h-full hidden lg:block">
         <img
-       src="/img/auth_img.png"
+          src="/img/auth_img.png"
           className="h-[90vh] w-full object-cover rounded-3xl"
         />
       </div>
@@ -22,21 +66,36 @@ export function SignUp() {
           <Typography variant="h2" className="font-bold mb-4">Join Us Today</Typography>
           <Typography variant="paragraph" color="blue-gray" className="text-lg font-normal">Enter your email and password to register.</Typography>
         </div>
-        <form className="mt-8 mb-2 mx-auto w-80 max-w-screen-lg lg:w-1/2">
-          <div className="mb-1 flex flex-col gap-6">
-            <Typography variant="small" color="blue-gray" className="-mb-3 font-medium">
-              Your email
-            </Typography>
-            <Input
-              size="lg"
-              placeholder="name@mail.com"
-              className=" !border-t-blue-gray-200 focus:!border-t-gray-900"
-              labelProps={{
-                className: "before:content-none after:content-none",
-              }}
-            />
-          </div>
+        <form onSubmit={registerNow} className="mt-8 mb-2 mx-auto w-80 max-w-screen-lg lg:w-1/2">
+          <CustomInput setFormValues={setFormValues} label="Seller Name" name="name" error={error} page={"register"} />
+          <CustomInput setFormValues={setFormValues} label="Company Name" name="companyName" error={error} page={"register"} />
+          <CustomInput setFormValues={setFormValues} label="Phone Number" name="phoneNumber" maxLength={10} error={error} page={"register"} />
+          <CustomInput setFormValues={setFormValues} label="EmailID" name="emailId" error={error} page={"register"} />
+          <CustomInput setFormValues={setFormValues} label="Password" name="password" error={error} page={"register"} />
+          <CustomInput
+          page={"register"}
+            error={error}
+            name="orders"
+            setFormValues={setFormValues}
+            inputClass=' bg-[#e8f0fe]'
+            value={''}
+            label="How many orders do you ship in a month ?"
+            isDropdown={true}
+            options={[
+              { value: '', label: 'Please Select' },
+              { value: 'Setting Up a new business', label: 'Setting Up a new business' },
+              { value: 'Between 1-10 Orders', label: 'Between 1-10 Orders' },
+              { value: '11-100 Orders', label: '11-100 Orders' },
+              { value: '101-1000 Orders', label: '101-1000 Orders' },
+              { value: '1001-5000 Orders', label: '1001-5000 Orders' },
+              { value: 'More than 5000 Orders', label: 'More than 5000 Orders' }
+
+            ]}
+          />
+
+
           <Checkbox
+            id="conditions"
             label={
               <Typography
                 variant="small"
@@ -54,7 +113,7 @@ export function SignUp() {
             }
             containerProps={{ className: "-ml-2.5" }}
           />
-          <Button className="mt-6 bg-primary text-text_primary" fullWidth>
+          <Button type="submit" className="mt-6 bg-primary text-text_primary" fullWidth>
             Register Now
           </Button>
 
