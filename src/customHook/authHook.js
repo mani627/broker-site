@@ -5,5 +5,5 @@ import {
 
 export function useAuth() {
   //const { isAuthenticated } = useContext(AuthContext);
-  return false; // or any logic to check if the user is authenticated
+  return true; // or any logic to check if the user is authenticated
 }

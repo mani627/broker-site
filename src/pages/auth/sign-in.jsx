@@ -1,4 +1,10 @@
 import CustomInput from "@/components/CustomInput";
+import { ForgotPasswordPopup } from "@/components/ForgetPasswordPopup";
+
+import LoadingPopup from "@/components/LoadingButton";
+// import LoadingButton from "@/components/LoadingButton";
+import PasswordInput from "@/components/PasswordInput";
+import { PhoneInput } from "@/components/PhoneInput";
 import { validateInput } from "@/util";
 import {
   Card,
@@ -44,7 +50,60 @@ export function SignIn() {
     }
 
   }
+  const [isCheckboxChecked, setIsCheckboxChecked] = useState(false);
+  const [isLoading, setIsLoading] = useState(false);
+  const [isPopupOpen, setIsPopupOpen] = useState(false);
+  const handleForgotPasswordClick = () => {
+    setShowPopup(true);
+  };
 
+  const handlePhoneSubmit = (phoneNumber) => {
+    setIsLoading(true);
+    console.log('Phone Number Submitted:', phoneNumber);
+
+    // Simulate an API call or async operation
+    setTimeout(() => {
+      setIsLoading(false);
+      alert(`Verification code sent to ${phoneNumber}`);
+      setShowPopup(false); // Close the popup after success
+    }, 3000);
+  };
+
+  const closeModal = () => {
+    setShowPopup(false);
+  };
+  const handleOperation = () => {
+    setIsLoading(true);
+
+    // Simulate an API call or some async operation
+    setTimeout(() => {
+      setIsLoading(false);
+      alert('Operation complete!');
+    }, 3000);
+  };
+  const [isForgotPasswordOpen, setIsForgotPasswordOpen] = useState(false);
+  const handlePasswordReset = async (data) => {
+    startLoading('Resetting password...');
+    try {
+      // Simulate API call
+      await new Promise((resolve) => setTimeout(resolve, 2000));
+      console.log('Password reset completed:', data);
+      setIsForgotPasswordOpen(false);
+    } finally {
+      stopLoading();
+    }
+  };
+  const handlePasswordReset1 = async (data) => {
+    startLoading('Resetting password...');
+    try {
+      // Simulate API call
+      await new Promise(resolve => setTimeout(resolve, 2000));
+      console.log('Password reset completed:', data);
+      setIsForgotPasswordOpen(false);
+    } finally {
+      stopLoading();
+    }
+  };
   return (
     <section className="m-8 flex gap-4 ">
       <div className="w-full lg:w-3/5 mt-24">
@@ -54,11 +113,13 @@ export function SignIn() {
         </div>
         <form onSubmit={Login} className="mt-8 mb-2 mx-auto w-80 max-w-screen-lg lg:w-1/2">
           <div className="mb-1 flex flex-col gap-6 h-[30vh]">
-            <CustomInput setFormValues={setFormValues} label="Phone Number" name="phoneNumber" maxLength={10} error={error} margin={""} />
-            <CustomInput setFormValues={setFormValues} label="Password" name="password" error={error}   margin={"-mt-5"}/>
+            <CustomInput setFormValues={setFormValues} label="Phone Number" placeholder={"0987654321"} name="phoneNumber" maxLength={10} error={error} margin={""} />
+            <PasswordInput setFormValues={setFormValues} label="Password" placeholder={"Enter your password"} error={error} margin={"-mt-5"} />
           </div>
           <Checkbox
-           id="conditions"
+            id="conditions"
+            checked={isCheckboxChecked}
+            onChange={(e)=>setIsCheckboxChecked(e.target.checked)}
             label={
               <Typography
                 variant="small"
@@ -76,10 +137,28 @@ export function SignIn() {
             }
             containerProps={{ className: "-ml-2.5" }}
           />
-          <Button type="submit" className="mt-6 bg-primary text-text_primary" fullWidth>
+          <Button type="submit" className={`mt-6 bg-primary text-text_primary ${
+              !isCheckboxChecked ? "opacity-50 cursor-not-allowed" : ""
+            }`}
+             fullWidth
+             disabled={!isCheckboxChecked}
+             >
             Sign In
           </Button>
+          <button
+            onClick={handleOperation}
+            className="px-4 py-2 font-semibold text-white bg-blue-600 rounded-md hover:bg-blue-700"
+          >
+            Start Operation
+          </button>
 
+          {/* Loading popup */}
+          <LoadingPopup
+            isLoading={isLoading}
+            size="lg" // Can be 'sm', 'md', or 'lg'
+            type="gif" // Can be 'spinner' or 'gif'
+            gifSrc="/img/icon_img.gif" // Path to custom GIF
+          />
           <div className="flex items-center justify-between gap-2 mt-6">
             {/* <Checkbox
               label={
@@ -94,10 +173,34 @@ export function SignIn() {
               containerProps={{ className: "-ml-2.5" }}
             /> */}
             <Typography variant="small" className="font-medium text-gray-900">
-              <a href="#">
+              <a href="#"
+                onClick={(e) => {
+                  e.preventDefault();
+                  setIsForgotPasswordOpen(true);
+                }}
+              >
                 Forgot Password ?
               </a>
             </Typography>
+            <ForgotPasswordPopup
+        isOpen={isForgotPasswordOpen}
+        onClose={() => setIsForgotPasswordOpen(false)}
+        onPasswordReset={handlePasswordReset1}
+      />
+            {/* {showPopup && (
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+          <div className="bg-white w-full max-w-md rounded-lg shadow-lg p-6 relative">
+            <button
+              onClick={closeModal}
+              className="absolute top-2 right-2 text-gray-400 hover:text-gray-600 focus:outline-none"
+            >
+              <span className="sr-only">Close</span>
+              &times;
+            </button>
+            <PhoneInput onSubmit={handlePhoneSubmit} isLoading={isLoading} />
+          </div>
+        </div>
+      )} */}
           </div>
           {/* oAuth */}
           {/* <div className="space-y-4 mt-8">
