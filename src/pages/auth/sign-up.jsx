@@ -1,4 +1,6 @@
 import CustomInput from "@/components/CustomInput";
+import PasswordInput from "@/components/PasswordInput";
+import { VerificationPopup } from "@/components/VerificationPopup";
 import { validateInput } from "@/util";
 
 import {
@@ -30,26 +32,35 @@ export function SignUp() {
     password: "",
     orders: ""
   })
-
+  const [isCheckboxChecked, setIsCheckboxChecked] = useState(false);
   const setFormValues = (key, value) => {
     setForm((prev) => ({
       ...prev,
       [key]: value
     }))
   }
-
-  const registerNow = (e) => {
-    e.preventDefault();
-    if (document.getElementById("conditions").checked) {
-      setError((prev) => {
-        let result = { ...prev }
-        Object.entries(formValue).forEach(([key, value]) => {
-          result[key] = validateInput(key, value) ? "" : "Invalid Input"
-        });
-        return result
-      })
+  const [isVerificationOpen, setIsVerificationOpen] = useState(false);
+  const registerNow =async (e) => {
+    // e.preventDefault();
+    // if (document.getElementById("conditions").checked) {
+    //   setError((prev) => {
+    //     let result = { ...prev }
+    //     Object.entries(formValue).forEach(([key, value]) => {
+    //       result[key] = validateInput(key, value) ? "" : "Invalid Input"
+    //     });
+    //     return result
+        
+    //   })
+    // }
+    startLoading('Verifying account...');
+    try {
+      // Simulate API call
+      await new Promise(resolve => setTimeout(resolve, 2000));
+      console.log('Password reset completed:', data);
+      setIsVerificationOpen(false);
+    } finally {
+      stopLoading();
     }
-
   }
  
 
@@ -67,11 +78,13 @@ export function SignUp() {
           <Typography variant="paragraph" color="blue-gray" className="text-lg font-normal">Enter your email and password to register.</Typography>
         </div>
         <form onSubmit={registerNow} className="mt-8 mb-2 mx-auto w-80 max-w-screen-lg lg:w-1/2">
-          <CustomInput setFormValues={setFormValues} label="Seller Name" name="name" error={error} page={"register"} />
-          <CustomInput setFormValues={setFormValues} label="Company Name" name="companyName" error={error} page={"register"} />
-          <CustomInput setFormValues={setFormValues} label="Phone Number" name="phoneNumber" maxLength={10} error={error} page={"register"} />
-          <CustomInput setFormValues={setFormValues} label="EmailID" name="emailId" error={error} page={"register"} />
-          <CustomInput setFormValues={setFormValues} label="Password" name="password" error={error} page={"register"} />
+          <CustomInput setFormValues={setFormValues} label="Seller Name" placeholder={"John"} name="name" error={error} page={"register"} />
+          <CustomInput setFormValues={setFormValues} label="Company Name" name="companyName" placeholder={"John Logistics"} error={error} page={"register"} />
+          <CustomInput setFormValues={setFormValues} label="Phone Number" name="phoneNumber" placeholder={"0987654321"} maxLength={10} error={error} page={"register"} />
+          <CustomInput setFormValues={setFormValues} label="EmailID" name="emailId" placeholder={"john@gmail.com"} error={error} page={"register"} />
+          <CustomInput setFormValues={setFormValues} label="Domain Name" name="emailId" placeholder={"john.shopify.com"} error={error} page={"register"} />
+          <CustomInput setFormValues={setFormValues} label="Access Token" name="emailId" placeholder={"dfbsj8392hs9202928dndo"} error={error} page={"register"} />
+          <PasswordInput setFormValues={setFormValues} label="Password" name="password" error={error} page={"register"} />
           <CustomInput
           page={"register"}
             error={error}
@@ -96,6 +109,8 @@ export function SignUp() {
 
           <Checkbox
             id="conditions"
+            checked={isCheckboxChecked}
+            onChange={(e) => setIsCheckboxChecked(e.target.checked)}
             label={
               <Typography
                 variant="small"
@@ -113,10 +128,22 @@ export function SignUp() {
             }
             containerProps={{ className: "-ml-2.5" }}
           />
-          <Button type="submit" className="mt-6 bg-primary text-text_primary" fullWidth>
+          <Button type="submit" className={`mt-6 bg-primary text-text_primary ${
+              !isCheckboxChecked ? "opacity-50 cursor-not-allowed" : ""
+            }`}
+             fullWidth
+             disabled={!isCheckboxChecked}
+             onClick={(e) => {
+              e.preventDefault();
+              setIsVerificationOpen(true);
+            }}
+             >
             Register Now
           </Button>
-
+            <VerificationPopup
+            isOpen={isVerificationOpen}
+            onClose={()=>setIsVerificationOpen(false)}
+            onPasswordReset={registerNow}/>
           {/* <div className="space-y-4 mt-8">
             <Button size="lg" color="white" className="flex items-center gap-2 justify-center shadow-md" fullWidth>
               <svg width="17" height="16" viewBox="0 0 17 16" fill="none" xmlns="http://www.w3.org/2000/svg">
