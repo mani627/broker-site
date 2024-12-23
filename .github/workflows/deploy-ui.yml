@@ -16,7 +16,7 @@ jobs:
     - name: Install Dependencies
       run: |
         echo "Installing dependencies..."
-        npm install
+        npm install --force
 
     - name: Build Project
       run: |
