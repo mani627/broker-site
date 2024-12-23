@@ -40,7 +40,7 @@ jobs:
     - name: Deploy to Hostinger
       run: |
         echo "Deploying UI to Hostinger VPS..."
-        ssh -o StrictHostKeyChecking=no ${{ secrets.HOSTINGER_USER }}@${{ secrets.HOSTINGER_IP }} << EOF
+        ssh -T -o StrictHostKeyChecking=no root@${{ secrets.HOSTINGER_IP }} << EOF
           # Navigate to the deployment path
           cd ${{ secrets.UI_DEPLOY_PATH }}
 
