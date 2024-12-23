@@ -1,0 +1,55 @@
+name: Deploy UI
+
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Checkout Code
+      uses: actions/checkout@v3
+
+    - name: Install Dependencies
+      run: npm ci
+
+    - name: Build Project
+      run: npm run build
+
+  deploy:
+    runs-on: ubuntu-latest
+    needs: build
+
+    steps:
+    - name: Checkout Code
+      uses: actions/checkout@v3
+
+    - name: Setup SSH
+      run: |
+        mkdir -p ~/.ssh
+        echo "${{ secrets.HOSTINGER_KEY }}" > ~/.ssh/id_rsa
+        chmod 600 ~/.ssh/id_rsa
+
+    - name: Deploy to Hostinger
+      run: |
+        ssh -o StrictHostKeyChecking=no ${{ secrets.HOSTINGER_USER }}@${{ secrets.HOSTINGER_IP }} << EOF
+      # Navigate to the UI deployment path
+        cd ${{ secrets.UI_DEPLOY_PATH }}
+      
+      # Remove only the dist folder if it exists
+      if [ -d "dist" ]; then
+        sudo rm -rf dist
+      fi
+    EOF
+    # Copy new build files to the deployment path
+    rsync -avz ./dist/ ${{ secrets.HOSTINGER_USER }}@${{ secrets.HOSTINGER_IP }}:${{ secrets.UI_DEPLOY_PATH }}
+
+
+    - name: Restart Nginx
+      run: |
+        ssh -o StrictHostKeyChecking=no ${{ secrets.HOSTINGER_USER }}@${{ secrets.HOSTINGER_IP }} << EOF
+          sudo systemctl reload nginx
+        EOF
