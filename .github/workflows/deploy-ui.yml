@@ -49,7 +49,17 @@ jobs:
         SERVER_USER: ${{ secrets.HOSTINGER_USER }}
       run: |
         echo "Deploying files..."
-        rsync -avz --delete dist/ $SERVER_USER@$SERVER_IP:$DEPLOY_PATH/dist/
+        echo "Current directory contents:"
+        ls -la
+        echo "Dist directory contents:"
+        ls -la dist/
+        
+        # Debug the rsync command
+        echo "RSYNC Command:"
+        echo "rsync -avz --delete dist/ ${SERVER_USER}@${SERVER_IP}:${DEPLOY_PATH}/dist/"
+        
+        # Execute rsync with proper variable expansion
+        rsync -avz --delete dist/ "${SERVER_USER}@${SERVER_IP}:${DEPLOY_PATH}/dist/"
 
     - name: Set Final Permissions
       env:
