@@ -59,7 +59,7 @@ jobs:
         echo "rsync -avz --delete dist/ ${SERVER_USER}@${SERVER_IP}:${DEPLOY_PATH}/dist/"
         
         # Execute rsync with proper variable expansion
-        rsync -avz --delete dist/ "${SERVER_USER}@${SERVER_IP}:${DEPLOY_PATH}/dist/"
+        rsync -avz --rsh=ssh --delete dist/ "${SERVER_USER}@${SERVER_IP}:${DEPLOY_PATH}/dist/"
 
     - name: Set Final Permissions
       env:
