@@ -56,7 +56,7 @@ jobs:
 
         # Copy new 'dist' folder to the deployment path
         echo "Copying new build files to the server..."
-        rsync -avz ./dist/ ${{ secrets.HOSTINGER_USER }}@${{ secrets.HOSTINGER_IP }}:${{ secrets.UI_DEPLOY_PATH }}/dist
+        rsync -avz ./dist ${{ secrets.HOSTINGER_USER }}@${{ secrets.HOSTINGER_IP }}:${{ secrets.UI_DEPLOY_PATH }}/
 
     - name: Restart Nginx (Optional)
       run: |
