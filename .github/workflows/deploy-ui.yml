@@ -28,18 +28,19 @@ jobs:
         mkdir -p ~/.ssh
         echo "${{ secrets.HOSTINGER_KEY }}" > ~/.ssh/id_ed25519
         chmod 600 ~/.ssh/id_ed25519
+        echo "StrictHostKeyChecking no" >> ~/.ssh/config
 
-    - name: Prepare Remote Directory
+    - name: Create and Set Permissions
       env:
         DEPLOY_PATH: ${{ secrets.UI_DEPLOY_PATH }}
         SERVER_IP: ${{ secrets.HOSTINGER_IP }}
         SERVER_USER: ${{ secrets.HOSTINGER_USER }}
       run: |
-        # First, ensure parent directory exists and we have permissions
-        ssh -o StrictHostKeyChecking=no $SERVER_USER@$SERVER_IP "sudo mkdir -p $DEPLOY_PATH && sudo chown -R $SERVER_USER:$SERVER_USER $DEPLOY_PATH"
-        
-        # Then create the dist directory
-        ssh -o StrictHostKeyChecking=no $SERVER_USER@$SERVER_IP "mkdir -p $DEPLOY_PATH/dist"
+        ssh $SERVER_USER@$SERVER_IP "
+          sudo mkdir -p $DEPLOY_PATH/dist
+          sudo chown -R $SERVER_USER:$SERVER_USER $DEPLOY_PATH
+          ls -la $DEPLOY_PATH
+        "
 
     - name: Deploy to Hostinger
       env:
@@ -47,33 +48,23 @@ jobs:
         SERVER_IP: ${{ secrets.HOSTINGER_IP }}
         SERVER_USER: ${{ secrets.HOSTINGER_USER }}
       run: |
-        echo "Deploying UI to Hostinger VPS..."
-        
-        # Debug: Show local directory structure
-        echo "Local directory structure:"
-        ls -la dist/
-        
-        # Debug: Show remote directory structure
-        echo "Remote directory structure:"
-        ssh -o StrictHostKeyChecking=no $SERVER_USER@$SERVER_IP "ls -la $DEPLOY_PATH"
-        
-        # Copy new build files to the server with verbose output
-        echo "Copying new build files to the server..."
-        rsync -avzh -e "ssh -o StrictHostKeyChecking=no" --progress dist/ "$SERVER_USER@$SERVER_IP:$DEPLOY_PATH/dist/"
+        echo "Deploying files..."
+        rsync -avz --delete dist/ $SERVER_USER@$SERVER_IP:$DEPLOY_PATH/dist/
 
-    - name: Verify Deployment
+    - name: Set Final Permissions
       env:
         DEPLOY_PATH: ${{ secrets.UI_DEPLOY_PATH }}
         SERVER_IP: ${{ secrets.HOSTINGER_IP }}
         SERVER_USER: ${{ secrets.HOSTINGER_USER }}
       run: |
-        echo "Verifying deployment..."
-        ssh -o StrictHostKeyChecking=no $SERVER_USER@$SERVER_IP "ls -la $DEPLOY_PATH/dist"
+        ssh $SERVER_USER@$SERVER_IP "
+          sudo chown -R $SERVER_USER:$SERVER_USER $DEPLOY_PATH
+          sudo chmod -R 755 $DEPLOY_PATH
+        "
 
     - name: Restart Nginx
       env:
         SERVER_IP: ${{ secrets.HOSTINGER_IP }}
         SERVER_USER: ${{ secrets.HOSTINGER_USER }}
       run: |
-        echo "Restarting Nginx..."
-        ssh -o StrictHostKeyChecking=no $SERVER_USER@$SERVER_IP "sudo systemctl reload nginx"
+        ssh $SERVER_USER@$SERVER_IP "sudo systemctl reload nginx"
