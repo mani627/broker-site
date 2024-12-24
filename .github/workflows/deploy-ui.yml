@@ -29,12 +29,16 @@ jobs:
         echo "${{ secrets.HOSTINGER_KEY }}" > ~/.ssh/id_ed25519
         chmod 600 ~/.ssh/id_ed25519
 
-    - name: Create Remote Directory
+    - name: Prepare Remote Directory
       env:
         DEPLOY_PATH: ${{ secrets.UI_DEPLOY_PATH }}
         SERVER_IP: ${{ secrets.HOSTINGER_IP }}
         SERVER_USER: ${{ secrets.HOSTINGER_USER }}
       run: |
+        # First, ensure parent directory exists and we have permissions
+        ssh -o StrictHostKeyChecking=no $SERVER_USER@$SERVER_IP "sudo mkdir -p $DEPLOY_PATH && sudo chown -R $SERVER_USER:$SERVER_USER $DEPLOY_PATH"
+        
+        # Then create the dist directory
         ssh -o StrictHostKeyChecking=no $SERVER_USER@$SERVER_IP "mkdir -p $DEPLOY_PATH/dist"
 
     - name: Deploy to Hostinger
@@ -45,12 +49,26 @@ jobs:
       run: |
         echo "Deploying UI to Hostinger VPS..."
         
-        # Verify dist directory exists locally
-        ls -la
+        # Debug: Show local directory structure
+        echo "Local directory structure:"
+        ls -la dist/
         
-        # Copy new build files to the server
+        # Debug: Show remote directory structure
+        echo "Remote directory structure:"
+        ssh -o StrictHostKeyChecking=no $SERVER_USER@$SERVER_IP "ls -la $DEPLOY_PATH"
+        
+        # Copy new build files to the server with verbose output
         echo "Copying new build files to the server..."
-        rsync -avz -e "ssh -o StrictHostKeyChecking=no" dist/ "$SERVER_USER@$SERVER_IP:$DEPLOY_PATH/dist/"
+        rsync -avzh -e "ssh -o StrictHostKeyChecking=no" --progress dist/ "$SERVER_USER@$SERVER_IP:$DEPLOY_PATH/dist/"
+
+    - name: Verify Deployment
+      env:
+        DEPLOY_PATH: ${{ secrets.UI_DEPLOY_PATH }}
+        SERVER_IP: ${{ secrets.HOSTINGER_IP }}
+        SERVER_USER: ${{ secrets.HOSTINGER_USER }}
+      run: |
+        echo "Verifying deployment..."
+        ssh -o StrictHostKeyChecking=no $SERVER_USER@$SERVER_IP "ls -la $DEPLOY_PATH/dist"
 
     - name: Restart Nginx
       env:
