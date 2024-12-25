@@ -37,6 +37,8 @@ export function Sidenav({ brandImg, brandName, routes }) {
             
             {brandName} &nbsp;
           </Typography>
+          
+          {/* gif */}
           <img className=" bg-blue-gray-300 h-[12%] w-[12%]" src="/img/icon_img.gif"/></div>
       
      
