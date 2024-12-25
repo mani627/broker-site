@@ -1,6 +1,6 @@
 import React, { useState, useRef, useEffect } from 'react';
 
-export function OTPInput({ length = 6, onComplete = () => {} }) {
+export function OTPInput({ disabled = false, length = 6, onComplete = () => {} }) {
     const [otp, setOtp] = useState(new Array(length).fill(''));
     const inputRefs = useRef([]);
 
@@ -37,6 +37,8 @@ export function OTPInput({ length = 6, onComplete = () => {} }) {
         <div className="flex gap-2 justify-center">
             {otp.map((value, index) => (
                 <input
+         
+                disabled={disabled}
                     key={index}
                     ref={(ref) => (inputRefs.current[index] = ref)}
                     type="text"

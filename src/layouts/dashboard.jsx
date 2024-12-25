@@ -9,22 +9,31 @@ import {
 } from "@/widgets/layout";
 import routes from "@/routes";
 import { useMaterialTailwindController, setOpenConfigurator } from "@/context";
+import { useAuth } from "@/context/authContext";
+import Subscription from "@/pages/dashboard/Subscription";
+import NotVerify from "@/components/NotVerify";
 
 export function Dashboard() {
   const [controller, dispatch] = useMaterialTailwindController();
   const { sidenavType } = controller;
 
+  const {userData , userInfo} = useAuth()
+
+  if(!userInfo.verified) return <NotVerify/>
 
   return (
     <div className="min-h-screen bg-blue-gray-50/50">
+    {userInfo.subscription || userInfo.subscription != null ?<>
       <Sidenav
         routes={routes}
         brandImg={
           sidenavType === "dark" ? "/img/logo-ct.png" : "/img/logo-ct-dark.png"
         }
       />
+
+      
       <div className="p-4 xl:ml-80">
-        <DashboardNavbar />
+        <DashboardNavbar pageTitle={"Order"} />
         {/* <Configurator /> */}
         <IconButton
           size="lg"
@@ -49,7 +58,12 @@ export function Dashboard() {
         <div className="text-blue-gray-600">
           <Footer />
         </div>
-      </div>
+      </div> </>
+       : //condiotion else here
+        <div className="">
+        <Subscription/>
+        </div>
+      }
     </div>
   );
 }

@@ -1,66 +1,116 @@
-// CustomInput.js
 import React from 'react';
 import { Select, Option } from "@material-tailwind/react";
 import { Typography, Input } from '@material-tailwind/react';
+import { Tooltip } from '@mui/material'; // Make sure you have this import
+import { BsInfoCircle } from 'react-icons/bs'; // Import the icon
 
 const CustomInput = ({
-  label,                      // Default label
-  placeholder,        // Default placeholder
-  size = "lg",                               // Default size
-  color = "blue-gray",                       // Default label color
-  labelClass = "-mb-6 font-medium",          // Default label class
-  inputClass = "!border-t-blue-gray-200 focus:!border-t-gray-900", // Default input class
-  isDropdown = false,                        // Condition for rendering a dropdown
+  label,
+  values = "",
+  placeholder,
+  size = "lg",
+  color = "blue-gray",
+  labelClass = "font-medium",
+  inputClass = "!border-t-blue-gray-200 focus:!border-t-gray-900",
+  isDropdown = false,
   options = [],
-  setFormValues = () => { },
+  setFormValues = () => {},
   name = "",
   margin = "",
   page = "",
-  error,                       // Options for dropdown, empty by default
+  error = "",
   ...props
-}) => (
-  <div id="ff" className={`mb-1.5 flex flex-col gap-6 relative h-[14vh]  ${page !== "register" ? 'max-md:h-[38%]' : 'max-md:h-[12vh]'} ${margin}`}>
-    {label && (
-      <Typography variant="small" color={color} className={labelClass}>
-        {label}
-      </Typography>
-    )}
+}) => {
 
-    {isDropdown ? (
-      <Select onChange={(e) => {
+  const tooltips = {
+    domainName: "Pick a valid domain name, without 'www' prefix",
+    accessToken: "Provide the access token to authenticate",
+  };
+  return (
+    <div
+      id="ff"
+      className={`mb-2 flex flex-col gap-1 relative ${page !== "register" ? 'max-md:h-[38%]' : 'max-md:h-[12vh]'} ${margin}`}
+    >
+      {label && (
+        <Typography variant="small" color={color} className={labelClass}>
+          {label}
+        </Typography>
+      )}
 
+      {name === 'domainName' || name === 'accessToken'  ? (
+        <Tooltip title={tooltips[name]} arrow placement="bottom">
+          <div className="flex items-center gap-2">
+            {isDropdown ? (
+              <Select
+                onChange={(e) => {
+                  setFormValues(name, e);
+                }}
+                className={`rounded-lg p-3 h-[6.5vh] ${inputClass}`}
+                {...props}
+              >
+                {options.map((option, index) => (
+                  <Option key={index} value={option.value}>
+                    {option.label}
+                  </Option>
+                ))}
+              </Select>
+            ) : (
+              <Input
+                size={size}
+                value={values}
+                placeholder={placeholder}
+                className={inputClass}
+                labelProps={{
+                  className: "before:content-none after:content-none",
+                }}
+                onChange={(e) => {
+                  setFormValues(name, e?.target.value);
+                }}
+                {...props}
+              />
+            )}
+            <BsInfoCircle className="cursor-pointer text-gray-500" />
+          </div>
+        </Tooltip>
+      ) : (
+        isDropdown ? (
+          <Select
+            onChange={(e) => {
+              setFormValues(name, e);
+            }}
+            className={`rounded-lg p-3 h-[6.5vh] ${inputClass}`}
+            {...props}
+          >
+            {options.map((option, index) => (
+              <Option key={index} value={option.value}>
+                {option.label}
+              </Option>
+            ))}
+          </Select>
+        ) : (
+          <Input
+            size={size}
+            placeholder={placeholder}
+            className={inputClass}
+          value={values}
+            labelProps={{
+              className: "before:content-none after:content-none",
+            }}
+            onChange={(e) => {
+              setFormValues(name, e?.target.value);
+            }}
+            {...props}
+          />
+        )
+      )}
 
-        setFormValues(name, e)
-      }} className={`rounded-lg p-3 h-[6.5vh] ${inputClass}`} {...props}>
-        {options.map((option, index) => (
-          <Option key={index} value={option.value}>
-            {option.label}
-          </Option>
-        ))}
-      </Select>
-    ) : (
-      <Input
-
-        size={size}
-        placeholder={placeholder}
-        className={inputClass}
-        labelProps={{
-          className: "before:content-none after:content-none",
-        }}
-        onChange={(e) => {
-          setFormValues(name, e?.target.value)
-        }}
-        {...props}
-      />
-    )}
-
-
-    {error &&
-
-      <span className=' text-error text-sm ' style={{ display: "block", position: "absolute", bottom: 0 }}>{error[name] ? error[name] : null}</span>
-
-    }
-  </div>
-);
+      {error && (
+        <span className="text-error text-sm" style={{ display: "block" }}>
+          {error[name] ? error[name] : null}
+        </span>
+      )}
+    </div>
+  );
+};
 
 export default CustomInput;

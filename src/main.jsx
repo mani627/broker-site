@@ -17,15 +17,24 @@ import { ThemeProvider } from "@material-tailwind/react";
 import { MaterialTailwindControllerProvider } from "@/context";
 import "../public/css/tailwind.css";
 import "../src/index.css"
+// import store from "./Redux/store";
+// import { Provider } from "react-redux";
+import 'react-toastify/dist/ReactToastify.css';
+
+
 
 ReactDOM.createRoot(document.getElementById("root")).render(
   <React.StrictMode>
+   {/* <Provider store={store}> */}
+  {/* deepan */}
     <BrowserRouter>
       <ThemeProvider>
         <MaterialTailwindControllerProvider>
           <App />
+     
         </MaterialTailwindControllerProvider>
       </ThemeProvider>
     </BrowserRouter>
+    {/* </Provider> */}
   </React.StrictMode>
 );

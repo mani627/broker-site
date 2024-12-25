@@ -1,10 +1,10 @@
 import CustomInput from "@/components/CustomInput";
 import { ForgotPasswordPopup } from "@/components/ForgetPasswordPopup";
-
+import { ToastContainer } from "react-toastify";
 import LoadingPopup from "@/components/LoadingButton";
-// import LoadingButton from "@/components/LoadingButton";
 import PasswordInput from "@/components/PasswordInput";
 import { PhoneInput } from "@/components/PhoneInput";
+import { useAuth } from "@/context/authContext";
 import { validateInput } from "@/util";
 import {
   Card,
@@ -13,224 +13,215 @@ import {
   Button,
   Typography,
 } from "@material-tailwind/react";
-import { useState } from "react";
-import { Link } from "react-router-dom";
+import { useEffect, useState } from "react";
+import { Link, useNavigate } from "react-router-dom";
+
+// Validation Functions
+const validatePhoneNumber = (phone) => {
+  const phoneRegex = /^[0-9]{10}$/;  // Ensure it's exactly 10 digits
+  return phoneRegex.test(phone);
+};
+
 
 
 export function SignIn() {
+  const { login } = useAuth();
+  const navigate = useNavigate();
+
   const [formValue, setForm] = useState({
-
     phoneNumber: "",
-
     password: "",
-
-  })
+  });
 
   const [error, setError] = useState({
     phoneNumber: "",
     password: "",
-  })
+  });
+
   const setFormValues = (key, value) => {
     setForm((prev) => ({
       ...prev,
-      [key]: value
-    }))
-  }
+      [key]: value,
+    }));
+  };
+
+  const validateFormOnChange = (key, value) => {
+    let newError = { ...error };
+
+    if (key === "phoneNumber") {
+      if (!value) {
+        newError.phoneNumber = "Phone number is required.";
+      } else if (value.length !== 10) {
+        newError.phoneNumber = "Phone number must be 10 digits.";
+      } else if (!validatePhoneNumber(value)) {
+        newError.phoneNumber = "Invalid phone number.";
+      } else {
+        newError.phoneNumber = "";
+      }
+    }
+
+    if (key === "password") {
+      if (!value) {
+        newError.password = "Password is required.";
+      } else if (value.length < 8) {
+        newError.password = "Password must be at least 8 characters.";
+      } else {
+        newError.password = "";
+      }
+    }
+
+    setError(newError);
+  };
 
   const Login = (e) => {
     e.preventDefault();
-    if (document.getElementById("conditions").checked) {
-      setError((prev) => {
-        let result = { ...prev }
-        Object.entries(formValue).forEach(([key, value]) => {
-          result[key] = validateInput(key, value) ? "" : "Invalid Input"
-        });
-        return result
-      })
+
+    let isValid = true;
+    let newError = { phoneNumber: "", password: "" };
+
+    // Validate Phone Number
+    if (!formValue.phoneNumber) {
+      newError.phoneNumber = "Phone number is required.";
+      isValid = false;
+    } else if (formValue.phoneNumber.length !== 10) {
+      newError.phoneNumber = "Phone number must be 10 digits.";
+      isValid = false;
     }
 
-  }
+    // Validate Password
+    if (!formValue.password) {
+      newError.password = "Password is required.";
+      isValid = false;
+    } else if (formValue.password.length < 8) {
+      newError.password = "Password must be at least 8 characters.";
+      isValid = false;
+    }
+
+    // Check if terms and conditions checkbox is checked
+    if (!document.getElementById("conditions").checked) {
+      newError.terms = "You must agree to the terms and conditions.";
+      isValid = false;
+    }
+
+    // Set errors if validation fails
+    setError(newError);
+
+    if (isValid) {
+      // Proceed with login logic if validation passes
+      login({phoneNumber:`+91${formValue.phoneNumber}`,password:formValue.password});
+    }
+  };
+
   const [isCheckboxChecked, setIsCheckboxChecked] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
-  const [isPopupOpen, setIsPopupOpen] = useState(false);
-  const handleForgotPasswordClick = () => {
-    setShowPopup(true);
-  };
-
-  const handlePhoneSubmit = (phoneNumber) => {
-    setIsLoading(true);
-    console.log('Phone Number Submitted:', phoneNumber);
-
-    // Simulate an API call or async operation
-    setTimeout(() => {
-      setIsLoading(false);
-      alert(`Verification code sent to ${phoneNumber}`);
-      setShowPopup(false); // Close the popup after success
-    }, 3000);
-  };
-
-  const closeModal = () => {
-    setShowPopup(false);
-  };
-  const handleOperation = () => {
-    setIsLoading(true);
-
-    // Simulate an API call or some async operation
-    setTimeout(() => {
-      setIsLoading(false);
-      alert('Operation complete!');
-    }, 3000);
-  };
   const [isForgotPasswordOpen, setIsForgotPasswordOpen] = useState(false);
-  const handlePasswordReset = async (data) => {
-    startLoading('Resetting password...');
-    try {
-      // Simulate API call
-      await new Promise((resolve) => setTimeout(resolve, 2000));
-      console.log('Password reset completed:', data);
-      setIsForgotPasswordOpen(false);
-    } finally {
-      stopLoading();
-    }
-  };
+
   const handlePasswordReset1 = async (data) => {
-    startLoading('Resetting password...');
+    setIsLoading(true);
     try {
-      // Simulate API call
-      await new Promise(resolve => setTimeout(resolve, 2000));
-      console.log('Password reset completed:', data);
+      await new Promise((resolve) => setTimeout(resolve, 2000));
+      console.log("Password reset completed:", data);
       setIsForgotPasswordOpen(false);
     } finally {
-      stopLoading();
+      setIsLoading(false);
     }
   };
+
   return (
     <section className="m-8 flex gap-4 ">
-      <div className="w-full lg:w-3/5 mt-24">
+      <ToastContainer />
+      <div className="w-full lg:w-3/5 mt-16">
         <div className="text-center">
-          <Typography variant="h2" className="font-bold mb-4">Sign In</Typography>
-          <Typography variant="paragraph" color="blue-gray" className="text-lg font-normal">Enter your email and password to Sign In.</Typography>
+          <Typography variant="h2" className="font-bold mb-4">
+            Sign In
+          </Typography>
+          <Typography variant="paragraph" color="blue-gray" className="text-lg font-normal">
+            Enter your phone number and password to Sign In.
+          </Typography>
         </div>
         <form onSubmit={Login} className="mt-8 mb-2 mx-auto w-80 max-w-screen-lg lg:w-1/2">
-          <div className="mb-1 flex flex-col gap-6 h-[30vh]">
-            <CustomInput setFormValues={setFormValues} label="Phone Number" placeholder={"0987654321"} name="phoneNumber" maxLength={10} error={error} margin={""} />
-            <PasswordInput setFormValues={setFormValues} label="Password" placeholder={"Enter your password"} error={error} margin={"-mt-5"} />
+          <div className="mb-1 flex flex-col ">
+            <CustomInput
+            values={formValue.phoneNumber}
+              setFormValues={setFormValues}
+              label="Phone Number"
+              placeholder={"0987654321"}
+              name="phoneNumber"
+              maxLength={10}
+              error={error}
+              margin={""}
+              onChange={(e) => {
+                setFormValues("phoneNumber", e.target.value);
+                validateFormOnChange("phoneNumber", e.target.value);
+              }}
+            />
+            <PasswordInput
+              setFormValues={setFormValues}
+              label="Password"
+              value={formValue.password}
+              placeholder={"Enter your password"}
+              error={error}
+              onChange={(e) => {
+                setFormValues("password", e.target.value);
+                validateFormOnChange("password", e.target.value);
+              }}
+            />
           </div>
           <Checkbox
             id="conditions"
             checked={isCheckboxChecked}
-            onChange={(e)=>setIsCheckboxChecked(e.target.checked)}
+            onChange={(e) => setIsCheckboxChecked(e.target.checked)}
             label={
-              <Typography
-                variant="small"
-                color="gray"
-                className="flex items-center justify-start font-medium"
-              >
-                I agree the&nbsp;
-                <a
-                  href="#"
-                  className="font-normal text-black transition-colors hover:text-gray-900 underline"
-                >
+              <Typography variant="small" color="gray" className="flex items-center justify-start font-medium">
+                I agree to the&nbsp;
+                <a href="#" className="font-normal text-black transition-colors hover:text-gray-900 underline">
                   Terms and Conditions
                 </a>
               </Typography>
             }
             containerProps={{ className: "-ml-2.5" }}
           />
-          <Button type="submit" className={`mt-6 bg-primary text-text_primary ${
-              !isCheckboxChecked ? "opacity-50 cursor-not-allowed" : ""
-            }`}
-             fullWidth
-             disabled={!isCheckboxChecked}
-             >
+          <Button
+            type="submit"
+            className={`mt-6 bg-primary text-text_primary ${!isCheckboxChecked ? "opacity-50 cursor-not-allowed" : ""}`}
+            fullWidth
+            disabled={!isCheckboxChecked}
+          >
             Sign In
           </Button>
-          <button
-            onClick={handleOperation}
-            className="px-4 py-2 font-semibold text-white bg-blue-600 rounded-md hover:bg-blue-700"
-          >
-            Start Operation
-          </button>
 
           {/* Loading popup */}
           <LoadingPopup
             isLoading={isLoading}
-            size="lg" // Can be 'sm', 'md', or 'lg'
-            type="gif" // Can be 'spinner' or 'gif'
-            gifSrc="/img/icon_img.gif" // Path to custom GIF
+            size="lg"
+            type="gif"
+            gifSrc="/img/icon_img.gif"
           />
           <div className="flex items-center justify-between gap-2 mt-6">
-            {/* <Checkbox
-              label={
-                <Typography
-                  variant="small"
-                  color="gray"
-                  className="flex items-center justify-start font-medium"
-                >
-                  Subscribe me to newsletter
-                </Typography>
-              }
-              containerProps={{ className: "-ml-2.5" }}
-            /> */}
             <Typography variant="small" className="font-medium text-gray-900">
-              <a href="#"
+              <a
+                href="#"
                 onClick={(e) => {
                   e.preventDefault();
                   setIsForgotPasswordOpen(true);
                 }}
               >
-                Forgot Password ?
+                Forgot Password?
               </a>
             </Typography>
             <ForgotPasswordPopup
-        isOpen={isForgotPasswordOpen}
-        onClose={() => setIsForgotPasswordOpen(false)}
-        onPasswordReset={handlePasswordReset1}
-      />
-            {/* {showPopup && (
-        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
-          <div className="bg-white w-full max-w-md rounded-lg shadow-lg p-6 relative">
-            <button
-              onClick={closeModal}
-              className="absolute top-2 right-2 text-gray-400 hover:text-gray-600 focus:outline-none"
-            >
-              <span className="sr-only">Close</span>
-              &times;
-            </button>
-            <PhoneInput onSubmit={handlePhoneSubmit} isLoading={isLoading} />
+              isOpen={isForgotPasswordOpen}
+              onClose={() => setIsForgotPasswordOpen(false)}
+              onPasswordReset={handlePasswordReset1}
+            />
           </div>
-        </div>
-      )} */}
-          </div>
-          {/* oAuth */}
-          {/* <div className="space-y-4 mt-8">
-            <Button size="lg" color="white" className="flex items-center gap-2 justify-center shadow-md" fullWidth>
-              <svg width="17" height="16" viewBox="0 0 17 16" fill="none" xmlns="http://www.w3.org/2000/svg">
-                <g clipPath="url(#clip0_1156_824)">
-                  <path d="M16.3442 8.18429C16.3442 7.64047 16.3001 7.09371 16.206 6.55872H8.66016V9.63937H12.9813C12.802 10.6329 12.2258 11.5119 11.3822 12.0704V14.0693H13.9602C15.4741 12.6759 16.3442 10.6182 16.3442 8.18429Z" fill="#4285F4" />
-                  <path d="M8.65974 16.0006C10.8174 16.0006 12.637 15.2922 13.9627 14.0693L11.3847 12.0704C10.6675 12.5584 9.7415 12.8347 8.66268 12.8347C6.5756 12.8347 4.80598 11.4266 4.17104 9.53357H1.51074V11.5942C2.86882 14.2956 5.63494 16.0006 8.65974 16.0006Z" fill="#34A853" />
-                  <path d="M4.16852 9.53356C3.83341 8.53999 3.83341 7.46411 4.16852 6.47054V4.40991H1.51116C0.376489 6.67043 0.376489 9.33367 1.51116 11.5942L4.16852 9.53356Z" fill="#FBBC04" />
-                  <path d="M8.65974 3.16644C9.80029 3.1488 10.9026 3.57798 11.7286 4.36578L14.0127 2.08174C12.5664 0.72367 10.6469 -0.0229773 8.65974 0.000539111C5.63494 0.000539111 2.86882 1.70548 1.51074 4.40987L4.1681 6.4705C4.8001 4.57449 6.57266 3.16644 8.65974 3.16644Z" fill="#EA4335" />
-                </g>
-                <defs>
-                  <clipPath id="clip0_1156_824">
-                    <rect width="16" height="16" fill="white" transform="translate(0.5)" />
-                  </clipPath>
-                </defs>
-              </svg>
-              <span>Sign in With Google</span>
-            </Button>
-            <Button size="lg" color="white" className="flex items-center gap-2 justify-center shadow-md" fullWidth>
-              <img src="/img/twitter-logo.svg" height={24} width={24} alt="" />
-              <span>Sign in With Twitter</span>
-            </Button>
-          </div> */}
           <Typography variant="paragraph" className="text-center text-blue-gray-500 font-medium mt-4">
             Not registered?
-            <Link to="/auth/sign-up" className="text-gray-900 ml-1">Create account</Link>
+            <Link to="/auth/sign-up" className="text-gray-900 ml-1">
+              Create account
+            </Link>
           </Typography>
         </form>
-
       </div>
       <div className="w-2/5 h-full hidden lg:block">
         <img
@@ -238,7 +229,6 @@ export function SignIn() {
           className="h-[93vh] w-full object-cover rounded-3xl bg-blue-gray-300"
         />
       </div>
-
     </section>
   );
 }

@@ -7,8 +7,10 @@ import {
   ServerStackIcon,
   RectangleStackIcon,
 } from "@heroicons/react/24/solid";
- import { Home, Profile, Tables, Notifications } from "@/pages/dashboard";
+import { Home, Profile, Notifications } from "@/pages/dashboard";
 import { SignIn, SignUp } from "@/pages/auth";
+import LogOut from "./pages/dashboard/LogOut";
+import OrderDetilas from "./widgets/layout/OrderDetilas";
 
 // Lazy-loaded components
 // const Home = lazy(() => import("@/pages/dashboard/Home"));
@@ -20,8 +22,8 @@ import { SignIn, SignUp } from "@/pages/auth";
 const icon = {
   className: "w-5 h-5  ",
 };
-const loader=<div class="flex justify-center items-center h-screen">
-<div class="w-16 h-16 border-4 border-blue-500 border-t-transparent rounded-full animate-spin"></div>
+const loader = <div class="flex justify-center items-center h-screen">
+  <div class="w-16 h-16 border-4 border-blue-500 border-t-transparent rounded-full animate-spin"></div>
 </div>
 
 export const routes = [
@@ -33,67 +35,60 @@ export const routes = [
         name: "Orders",
         path: "/home",
         element: (
-         // <Suspense fallback={loader}>
-            <Home />
-         //  </Suspense>
-        ),
-      },
-      {
-        icon: <UserCircleIcon {...icon} />,
-        name: "profile",
-        path: "/profile",
-        element: (
-         // <Suspense fallback={loader}>
-            <Profile />
-         //  </Suspense>
-        ),
-      },
-      {
-        icon: <TableCellsIcon {...icon} />,
-        name: "tables",
-        path: "/tables",
-        element: (
-         // <Suspense fallback={loader}>
-            <Tables />
-         //  </Suspense>
-        ),
-      },
-      {
-        icon: <InformationCircleIcon {...icon} />,
-        name: "notifications",
-        path: "/notifications",
-        element: (
-         // <Suspense fallback={loader}>
-            <Notifications />
-         //  </Suspense>
-        ),
-      },
-    ],
-  },
-  {
-    title: "auth pages",
-    layout: "auth",
-    pages: [
-      {
-        icon: <ServerStackIcon {...icon} />,
-        name: "sign in",
-        path: "/sign-in",
-        element: (
-         
-            <SignIn />
-         
+          // <Suspense fallback={loader}>
+          <Home />
+          //  </Suspense>
         ),
       },
       {
         icon: <RectangleStackIcon {...icon} />,
-        name: "sign up",
-        path: "/sign-up",
+        name: "Profile",
+        path: "/profile",
         element: (
-         
-            <SignUp />
-         
+          // <Suspense fallback={loader}>
+          <Profile />
+          //  </Suspense>
         ),
       },
+      {
+        icon: <HomeIcon {...icon} />,
+        name: "orderID",
+        path: "/home/:id",
+        element: (
+          // <Suspense fallback={loader}>
+          <OrderDetilas />
+          //  </Suspense>
+        ),
+      },
+  
+      
+    ],
+  },
+  {
+    title: "Other Setting",
+    layout: "auth",
+    pages: [
+      {
+        icon: <RectangleStackIcon {...icon} />,
+        name: "SignIN",
+        path: "/sign-in",
+        element: (
+          // <Suspense fallback={loader}>
+          <SignIn />
+          //  </Suspense>
+        ),
+      },
+      {
+        icon: <RectangleStackIcon {...icon} />,
+        name: "SignUp",
+        path: "/sign-up",
+        element: (
+          // <Suspense fallback={loader}>
+          <SignUp />
+          //  </Suspense>
+        ),
+      },
+    
     ],
   },
 ];

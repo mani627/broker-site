@@ -1,72 +1,94 @@
-import React from "react";
+import React, { useEffect, useState } from "react";
 import {
   Typography,
   Card,
   CardHeader,
   CardBody,
-  IconButton,
   Menu,
-  MenuHandler,
-  MenuList,
-  MenuItem,
-  Avatar,
-  Tooltip,
-  Progress,
-} from "@material-tailwind/react";
-import {
-  EllipsisVerticalIcon,
-  ArrowUpIcon,
-} from "@heroicons/react/24/outline";
-import { StatisticsCard } from "@/widgets/cards";
-import { StatisticsChart } from "@/widgets/charts";
-import {
-  statisticsCardsData,
-  statisticsChartsData,
-  projectsTableData,
-  ordersOverviewData,
-} from "@/data";
-import { CheckCircleIcon, ClockIcon } from "@heroicons/react/24/solid";
 
+} from "@material-tailwind/react";
+import { StatisticsChart } from "@/widgets/charts";
+import { FormControl, InputAdornment, InputLabel, MenuItem, Select, Skeleton, TextField } from "@mui/material";
+
+// import { useDispatch, useSelector } from 'react-redux';
+import { useAuth } from "@/context/authContext";
+
+import SellerTable from "@/components/SellerTable";
+
+import { BsSearch } from "react-icons/bs";
+import TasksCard from "@/components/TasksCard";
+import { ToastContainer } from "react-toastify";
+import { AdmintableData, AdminTaskData, SellerTableData, sellerTasksData } from "@/data/dummyData";
+import AdminTable from "@/components/AdminATable";
 export function Home() {
+
+  const { userInfo ,setpageHeading } = useAuth()
+
+  useEffect(() => {
+    setpageHeading({title:"Home",backURL:null})
+    return () => {
+      
+    };
+  }, []);
+  // dispatch here
+  // const dispatch = useDispatch();
+
+  const [tasksDetails, settasksDetails] = useState({
+    tasks: userInfo.roll == 'admin' ? [...AdminTaskData] : userInfo.roll == 'user' ? [...sellerTasksData] : [],
+    error: null,
+    loading: false,
+  });
+
+  const [tableDetails, settableDetails] = useState({
+
+    tables: userInfo.roll == 'admin' ? [...AdmintableData] : userInfo.roll == 'user' ? [...SellerTableData] : [],
+    error: null,
+    loading: false,
+  });
+
+
+  const [status, setStatus] = useState("All");
+  const [adminTableSearch, setadminTableSearch] = useState('');
+
+
+  const handleChange = (event) => {
+    setStatus(event.target.value);
+  };
+
+
+
   return (
-    <div className="mt-12">
-      {/* <div className="mb-12 grid gap-y-10 gap-x-6 md:grid-cols-2 xl:grid-cols-4">
-        {statisticsCardsData.map(({ icon, title, footer, ...rest }) => (
-          <StatisticsCard
-            key={title}
-            {...rest}
-            title={title}
-            icon={React.createElement(icon, {
-              className: "w-6 h-6 text-white",
-            })}
-            footer={
-              <Typography className="font-normal text-blue-gray-600">
-                <strong className={footer.color}>{footer.value}</strong>
-                &nbsp;{footer.label}
-              </Typography>
-            }
-          />
-        ))}
-      </div> */}
-      <div className="mb-6 grid grid-cols-1 gap-y-12 gap-x-6 md:grid-cols-2 xl:grid-cols-3">
-        {statisticsChartsData.map((props) => (
-          <StatisticsChart
-            key={props.title}
-            {...props}
-            footer={
-              <Typography
-                variant="small"
-                className="flex items-center font-normal text-blue-gray-600"
-              >
-                <ClockIcon strokeWidth={2} className="h-4 w-4 text-blue-gray-400" />
-                &nbsp;{props.footer}
-              </Typography>
-            }
-          />
-        ))}
+    <div className="mt-4">
+      <ToastContainer />
+
+      <div className="mb-6 grid grid-cols-1 gap-y-6 gap-x-6 md:grid-cols-2 xl:grid-cols-3">
+        {tasksDetails.loading ?
+          [1, 2, 3].map((load, i) => <Card key={i} className="py-3 mx-auto md:w-full w-[70%] p-3">
+            <Skeleton variant="rounded" className="w-[70%] mt-2" height={10} />
+            <Skeleton variant="rounded" className="w-[90%] my-2" height={50} />
+          </Card>)
+          :
+          tasksDetails.tasks.map((task, i) => (
+            <TasksCard key={i} roll={'admin'} title={task.title} data={task.data} />
+          ))
+          // <StatisticsChart
+
+          //   key={props.title}
+          //   {...props}
+          // footer={
+          //   <Typography
+          //     variant="small"
+          //     className="flex items-center font-normal text-blue-gray-600"
+          //   >
+          //     <ClockIcon strokeWidth={2} className="h-4 w-4 text-blue-gray-400" />
+          //     &nbsp;{props.footer}
+          //   </Typography>
+          // }
+          //   /> 
+        }
       </div>
       <div className="mb-4 grid grid-cols-1 gap-6 xl:grid-cols-3">
-        <Card className="overflow-hidden xl:col-span-2 border border-blue-gray-100 shadow-sm">
+        <Card className="overflow-hidden xl:col-span-3 border border-blue-gray-100 shadow-sm">
           <CardHeader
             floated={false}
             shadow={false}
@@ -75,125 +97,105 @@ export function Home() {
           >
             <div>
               <Typography variant="h6" color="blue-gray" className="mb-1">
-                Projects
+                Order data
               </Typography>
-              <Typography
+              {/* <Typography
                 variant="small"
                 className="flex items-center gap-1 font-normal text-blue-gray-600"
               >
                 <CheckCircleIcon strokeWidth={3} className="h-4 w-4 text-blue-gray-200" />
                 <strong>30 done</strong> this month
-              </Typography>
+              </Typography> */}
             </div>
             <Menu placement="left-start">
-              <MenuHandler>
-                <IconButton size="sm" variant="text" color="blue-gray">
-                  <EllipsisVerticalIcon
-                    strokeWidth={3}
-                    fill="currenColor"
-                    className="h-6 w-6"
+
+              {userInfo.roll == 'user' ?
+                <FormControl className="w-44" variant="outlined" size="small">
+                  <InputLabel>Status</InputLabel>
+                  <Select
+                    value={status}
+                    onChange={handleChange}
+                    label="Status"
+                    defaultValue="All"
+                  >
+                    <MenuItem value="All">All</MenuItem>
+                    <MenuItem value="pending">Pending</MenuItem>
+                    <MenuItem value="cancelled">Cancelled</MenuItem>
+                    <MenuItem value="completed">Completed</MenuItem>
+                  </Select>
+                </FormControl>
+                :
+                <FormControl className="w-44" variant="outlined" size="small">
+
+                  <TextField
+                    label="Search"
+                    size="small"
+                    value={adminTableSearch}
+                    className="w-[100%]"
+                    onChange={(event) => setadminTableSearch(event.target.value)}
+                    id="outlined-end-adornment"
+                    sx={{
+                      '& .MuiOutlinedInput-root': {
+                        '& fieldset': {
+                          borderColor: 'gray', // Default border color
+                        },
+                        '&:hover fieldset': {
+                          borderColor: '#e80674', // Border color on hover
+                        },
+                        '&.Mui-focused fieldset': {
+                          borderColor: '#e80674', // Border color when focused
+                        },
+                      },
+                      '& .MuiInputLabel-root': {
+                        color: 'gray', // Default label color
+                      },
+                      '& .MuiInputLabel-root.Mui-focused': {
+                        color: '#e80674', // Label color when focused
+                      },
+                      '& .MuiInputAdornment-root': {
+                        color: 'gray', // Default icon color
+                      },
+                      '& .Mui-focused .MuiInputAdornment-root': {
+                        color: '#e80674', // Icon color when focused
+                      },
+                    }}
+                    slotProps={{
+                      input: {
+                        endAdornment: (
+                          <InputAdornment position="end">
+                            <BsSearch />
+                          </InputAdornment>
+                        ),
+                      },
+                    }}
                   />
-                </IconButton>
-              </MenuHandler>
-              <MenuList>
-                <MenuItem>Action</MenuItem>
-                <MenuItem>Another Action</MenuItem>
-                <MenuItem>Something else here</MenuItem>
-              </MenuList>
+                </FormControl>
+              }
+
+
             </Menu>
           </CardHeader>
-          <CardBody className="overflow-x-scroll px-0 pt-0 pb-2">
-            <table className="w-full min-w-[640px] table-auto">
-              <thead>
-                <tr>
-                  {["companies", "members", "budget", "completion"].map(
-                    (el) => (
-                      <th
-                        key={el}
-                        className="border-b border-blue-gray-50 py-3 px-6 text-left"
-                      >
-                        <Typography
-                          variant="small"
-                          className="text-[11px] font-medium uppercase text-blue-gray-400"
-                        >
-                          {el}
-                        </Typography>
-                      </th>
-                    )
-                  )}
-                </tr>
-              </thead>
-              <tbody>
-                {projectsTableData.map(
-                  ({ img, name, members, budget, completion }, key) => {
-                    const className = `py-3 px-5 ${
-                      key === projectsTableData.length - 1
-                        ? ""
-                        : "border-b border-blue-gray-50"
-                    }`;
+          <CardBody className=" px-0 pt-0 pb-2 relative">
+            {/* {userInfo == "seller" &&
+              <CustomizeTable roll={userInfo} data={tables} loading={tableLoading} heading={["Order ID/ waybill ID", "Created Date", "Pickup & Delivery Address", "Payment Mode"]} />}
 
-                    return (
-                      <tr key={name}>
-                        <td className={className}>
-                          <div className="flex items-center gap-4">
-                            <Avatar src={img} alt={name} size="sm" />
-                            <Typography
-                              variant="small"
-                              color="blue-gray"
-                              className="font-bold"
-                            >
-                              {name}
-                            </Typography>
-                          </div>
-                        </td>
-                        <td className={className}>
-                          {members.map(({ img, name }, key) => (
-                            <Tooltip key={name} content={name}>
-                              <Avatar
-                                src={img}
-                                alt={name}
-                                size="xs"
-                                variant="circular"
-                                className={`cursor-pointer border-2 border-white ${
-                                  key === 0 ? "" : "-ml-2.5"
-                                }`}
-                              />
-                            </Tooltip>
-                          ))}
-                        </td>
-                        <td className={className}>
-                          <Typography
-                            variant="small"
-                            className="text-xs font-medium text-blue-gray-600"
-                          >
-                            {budget}
-                          </Typography>
-                        </td>
-                        <td className={className}>
-                          <div className="w-10/12">
-                            <Typography
-                              variant="small"
-                              className="mb-1 block text-xs font-medium text-blue-gray-600"
-                            >
-                              {completion}%
-                            </Typography>
-                            <Progress
-                              value={completion}
-                              variant="gradient"
-                              color={completion === 100 ? "green" : "blue"}
-                              className="h-1"
-                            />
-                          </div>
-                        </td>
-                      </tr>
-                    );
-                  }
-                )}
-              </tbody>
-            </table>
+            {userInfo == 'admin' && <CustomizeTable roll={userInfo} data={Admintable} loading={tableLoading} heading={["Seller ID", "Wallat Amount", "Subscription Plan", "Action"]} />}
+ */}
+
+
+            {userInfo.roll == 'user' &&
+              <SellerTable data={tableDetails.tables} loading={tableDetails.loading} searchKey={status} heading={["Order ID/ waybill ID", "Created Date", "Pickup & Delivery Address", "Payment Mode"]} />
+            }
+
+            {userInfo.roll == 'admin' &&
+              <AdminTable data={tableDetails.tables} setChanges={settableDetails} searchKey={adminTableSearch} loading={tableDetails.loading} heading={["Seller Name", "Wallat Amount", "Subscription Plan", "Action"]} />}
+
+
+
+
           </CardBody>
         </Card>
-        <Card className="border border-blue-gray-100 shadow-sm">
+        {/* <Card className="border border-blue-gray-100 shadow-sm">
           <CardHeader
             floated={false}
             shadow={false}
@@ -249,7 +251,7 @@ export function Home() {
               )
             )}
           </CardBody>
-        </Card>
+        </Card> */}
       </div>
     </div>
   );
