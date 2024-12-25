@@ -108,7 +108,7 @@ export const statisticsChartsData = [
   {
     color: "white",
     title: "Orders",
-    description: "Last Campaign Performance",
+    description: "14 Orders Pending",
     footer: "campaign sent 2 days ago",
     chart: websiteViewsChart,
   },

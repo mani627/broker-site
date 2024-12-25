@@ -6,13 +6,14 @@ import {
   ArrowRightOnRectangleIcon,
 } from "@heroicons/react/24/solid";
 import routes from "@/routes";
-import { useAuth } from "@/customHook/authHook"; // Import your auth hook
+import { useAuth } from "@/context/authContext";
+// import { useAuth } from "@/customHook/authHook"; // Import your auth hook
 
 export function Auth() {
-  const isAuthenticated = useAuth(); // Check if the user is authenticated
-
+  // const isAuthenticated = useAuth(); // Check if the user is authenticated
+  const {auth} = useAuth()
   // Redirect to dashboard if the user is already authenticated
-  if (isAuthenticated) {
+  if (auth) {
     return <Navigate to="/dashboard/home" replace />;
   }
 

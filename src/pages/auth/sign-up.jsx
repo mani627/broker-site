@@ -1,6 +1,7 @@
 import CustomInput from "@/components/CustomInput";
 import PasswordInput from "@/components/PasswordInput";
 import { VerificationPopup } from "@/components/VerificationPopup";
+import { useAuth } from "@/context/authContext";
 import { validateInput } from "@/util";
 
 import {
@@ -12,16 +13,23 @@ import {
 } from "@material-tailwind/react";
 import { useState } from "react";
 import { Link } from "react-router-dom";
+import { toast, ToastContainer } from "react-toastify";
 
 
 export function SignUp() {
+
+
+  const { signUp } = useAuth()
+
   const [formValue, setForm] = useState({
     name: "",
     companyName: "",
     phoneNumber: "",
     emailId: "",
     password: "",
-    orders: ""
+    orders: "",
+    domainName: "",
+    accessToken: ""
   })
 
   const [error, setError] = useState({
@@ -30,17 +38,108 @@ export function SignUp() {
     phoneNumber: "",
     emailId: "",
     password: "",
-    orders: ""
+    orders: "",
+    domainName: "",
+    accessToken: ""
   })
   const [isCheckboxChecked, setIsCheckboxChecked] = useState(false);
   const setFormValues = (key, value) => {
+    // Validate the input whenever the value changes
+    const validationErrors = { ...error };
+    if (!validateInput(key, value)) {
+      validationErrors[key] = `Invalid ${key.replace(/([A-Z])/g, " $1")}`; // Custom error message for invalid input
+    } else {
+      validationErrors[key] = ""; // Clear error if valid
+    }
+
+    setError(validationErrors); // Update error state
     setForm((prev) => ({
       ...prev,
       [key]: value
-    }))
-  }
+    }));
+  };
   const [isVerificationOpen, setIsVerificationOpen] = useState(false);
-  const registerNow =async (e) => {
+
+
+  const validateInput = (key, value) => {
+    switch (key) {
+      case "name":
+        return /^[A-Za-z\s]+$/.test(value) && value.length >= 2; // Only letters and spaces, minimum 2 characters
+      case "companyName":
+        return value.trim().length > 2; // Minimum 3 characters
+      case "phoneNumber":
+        return /^\d{10}$/.test(value); // Exactly 10 digits
+      case "emailId":
+        return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(value); // Basic email validation
+      case "password":
+        return /^(?=.*[a-z])(?=.*[A-Z])(?=.*[!@#$%^&*(),.?":{}|<>])[A-Za-z!@#$%^&*(),.?":{}|<>0-9]{8,}$/.test(value);
+
+      case "orders":
+        return value !== ""; // Must be selected
+      case "domainName":
+        return /^(?!www\.)(?!:\/\/)([a-zA-Z0-9-]+\.)+[a-zA-Z]{2,}$/.test(value); // Basic domain name validation
+      case "accessToken":
+        return value.trim().length > 0; // Cannot be empty
+      default:
+        return true; // Default to valid for unspecified fields
+    }
+  };
+  const registerNow = async (e) => {
+    e.preventDefault();
+
+
+    // Perform validation for all fields
+    const validationErrors = {};
+    Object.entries(formValue).forEach(([key, value]) => {
+      if (!validateInput(key, value)) {
+        validationErrors[key] = `Invalid ${key.replace(/([A-Z])/g, " $1")}`; // Custom error message for invalid input
+      } else {
+        validationErrors[key] = ""; // Clear any existing errors if valid
+      }
+    });
+    // Update error state
+    setError(validationErrors);
+
+    // Check if any error exists
+    const hasErrors = Object.values(validationErrors).some((error) => error !== "");
+
+    // Proceed only if there are no errors
+
+
+    if (!hasErrors && isCheckboxChecked) {
+      await signUp(formValue).then(res => {
+        toast.success('Account created successfully , Enter your OTP', {
+          position: "top-right",
+          autoClose: false,
+          hideProgressBar: false,
+          closeOnClick: true,
+          pauseOnHover: true,
+          draggable: true,
+          progress: undefined,
+        });
+        // Open verification popup
+            setIsVerificationOpen(true);
+
+      }).catch(error => {
+        const errorMessage = error?.response?.data?.message || "Invalid credentials"
+        toast.error(errorMessage, {
+          position: "top-right",
+          autoClose: false,
+          hideProgressBar: false,
+          closeOnClick: true,
+          pauseOnHover: true,
+          draggable: true,
+          progress: undefined,
+        });
+      })
+
+
+    } else if (!isCheckboxChecked) {
+      alert("Please agree to the Terms and Conditions to register.");
+    }
+
+
+
     // e.preventDefault();
     // if (document.getElementById("conditions").checked) {
     //   setError((prev) => {
@@ -49,23 +148,25 @@ export function SignUp() {
     //       result[key] = validateInput(key, value) ? "" : "Invalid Input"
     //     });
     //     return result
-        
+
     //   })
     // }
-    startLoading('Verifying account...');
-    try {
-      // Simulate API call
-      await new Promise(resolve => setTimeout(resolve, 2000));
-      console.log('Password reset completed:', data);
-      setIsVerificationOpen(false);
-    } finally {
-      stopLoading();
-    }
+    // startLoading('Verifying account...');
+    // try {
+    //   // Simulate API call
+    //   await new Promise(resolve => setTimeout(resolve, 2000));
+    //   console.log('Password reset completed:', data);
+    //   setIsVerificationOpen(false);
+    // } finally {
+    //   stopLoading();
+    // }
   }
- 
+
+
 
   return (
     <section className="m-8 flex">
+      <ToastContainer />
       <div className="w-2/5 h-full hidden lg:block">
         <img
           src="/img/auth_img.png"
@@ -78,15 +179,16 @@ export function SignUp() {
           <Typography variant="paragraph" color="blue-gray" className="text-lg font-normal">Enter your email and password to register.</Typography>
         </div>
         <form onSubmit={registerNow} className="mt-8 mb-2 mx-auto w-80 max-w-screen-lg lg:w-1/2">
-          <CustomInput setFormValues={setFormValues} label="Seller Name" placeholder={"John"} name="name" error={error} page={"register"} />
-          <CustomInput setFormValues={setFormValues} label="Company Name" name="companyName" placeholder={"John Logistics"} error={error} page={"register"} />
-          <CustomInput setFormValues={setFormValues} label="Phone Number" name="phoneNumber" placeholder={"0987654321"} maxLength={10} error={error} page={"register"} />
-          <CustomInput setFormValues={setFormValues} label="EmailID" name="emailId" placeholder={"john@gmail.com"} error={error} page={"register"} />
-          <CustomInput setFormValues={setFormValues} label="Domain Name" name="emailId" placeholder={"john.shopify.com"} error={error} page={"register"} />
-          <CustomInput setFormValues={setFormValues} label="Access Token" name="emailId" placeholder={"dfbsj8392hs9202928dndo"} error={error} page={"register"} />
-          <PasswordInput setFormValues={setFormValues} label="Password" name="password" error={error} page={"register"} />
+          <CustomInput setFormValues={setFormValues} value={formValue.name} label="Seller Name" placeholder={"John"} name="name" error={error} page={"register"} />
+          <CustomInput setFormValues={setFormValues} value={formValue.companyName} label="Company Name" name="companyName" placeholder={"John Logistics"} error={error} page={"register"} />
+          <CustomInput setFormValues={setFormValues} value={formValue.phoneNumber} label="Phone Number" name="phoneNumber" placeholder={"0987654321"} maxLength={10} error={error} page={"register"} />
+          <CustomInput setFormValues={setFormValues} value={formValue.emailId} label="EmailID" name="emailId" placeholder={"john@gmail.com"} error={error} page={"register"} />
+          <CustomInput setFormValues={setFormValues} value={formValue.domainName} label="Domain Name" name="domainName" placeholder={"john.shopify.com"} error={error} page={"register"} />
+          <CustomInput setFormValues={setFormValues} value={formValue.accessToken} label="Access Token" name="accessToken" placeholder={"dfbsj8392hs9202928dndo"} error={error} page={"register"} />
+          <PasswordInput setFormValues={setFormValues} conText = {true} label="Password" value={formValue.password} name="password" error={error} page={"register"} />
+          
           <CustomInput
-          page={"register"}
+            page={"register"}
             error={error}
             name="orders"
             setFormValues={setFormValues}
@@ -128,22 +230,19 @@ export function SignUp() {
             }
             containerProps={{ className: "-ml-2.5" }}
           />
-          <Button type="submit" className={`mt-6 bg-primary text-text_primary ${
-              !isCheckboxChecked ? "opacity-50 cursor-not-allowed" : ""
+          <Button type="submit" className={`mt-6 bg-primary text-text_primary ${!isCheckboxChecked ? "opacity-50 cursor-not-allowed" : ""
             }`}
-             fullWidth
-             disabled={!isCheckboxChecked}
-             onClick={(e) => {
-              e.preventDefault();
-              setIsVerificationOpen(true);
-            }}
-             >
+            fullWidth
+            disabled={!isCheckboxChecked}
+            onClick={(e) => registerNow(e)}
+          >
             Register Now
           </Button>
-            <VerificationPopup
+          <VerificationPopup
             isOpen={isVerificationOpen}
-            onClose={()=>setIsVerificationOpen(false)}
-            onPasswordReset={registerNow}/>
+            phoneNumber={formValue.phoneNumber}
+            onClose={() => setIsVerificationOpen(false)}
+            onPasswordReset={registerNow} />
           {/* <div className="space-y-4 mt-8">
             <Button size="lg" color="white" className="flex items-center gap-2 justify-center shadow-md" fullWidth>
               <svg width="17" height="16" viewBox="0 0 17 16" fill="none" xmlns="http://www.w3.org/2000/svg">

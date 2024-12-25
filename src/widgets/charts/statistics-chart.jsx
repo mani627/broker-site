@@ -2,38 +2,37 @@ import {
   Card,
   CardHeader,
   CardBody,
-  CardFooter,
   Typography,
 } from "@material-tailwind/react";
 import PropTypes from "prop-types";
 import Chart from "react-apexcharts";
 
-export function StatisticsChart({ color, chart, title, description, footer }) {
+export function StatisticsChart({ color, chart, title, description }) {
   return (
-    <Card className="border border-blue-gray-100 shadow-sm">
-      <CardHeader variant="gradient" color={color} floated={false} shadow={false}>
+    <Card className="w-full cursor-pointer max-w-md mx-auto border border-gray-200 shadow-sm rounded-lg transition-all hover:scale-100 hover:shadow-md duration-300">
+      <CardHeader
+        variant="gradient"
+        color={color}
+        floated={false}
+        shadow={true}
+        className="rounded-t-lg"
+      >
         {/* <Chart {...chart} /> */}
       </CardHeader>
-      <CardBody className="px-6 pt-0">
-        <Typography variant="h6" color="blue-gray">
+      <CardBody className="px-6 pt-4 pb-8">
+        <Typography variant="small" color="blue-gray" className="font-bold text-lg">
           {title}
         </Typography>
-        <Typography variant="small" className="font-normal text-blue-gray-600">
+        <Typography variant="h5" className="font-normal text-blue-gray-600 mt-2">
           {description}
         </Typography>
       </CardBody>
-      {footer && (
-        <CardFooter className="border-t border-blue-gray-50 px-6 py-5">
-          {footer}
-        </CardFooter>
-      )}
     </Card>
   );
 }
 
 StatisticsChart.defaultProps = {
   color: "blue",
-  footer: null,
 };
 
 StatisticsChart.propTypes = {
@@ -62,7 +61,6 @@ StatisticsChart.propTypes = {
   chart: PropTypes.object.isRequired,
   title: PropTypes.node.isRequired,
   description: PropTypes.node.isRequired,
-  footer: PropTypes.node,
 };
 
 StatisticsChart.displayName = "/src/widgets/charts/statistics-chart.jsx";

@@ -7,8 +7,8 @@ export function useResetPassword() {
     const { startLoading, stopLoading, isLoading, loadingText } = useLoadingState();
 
     const resetFlow = () => {
-        setStep('phone');
-        setPhoneNumber('');
+        setStep('otp');
+        setPhoneNumber( '');
     };
 
     return {

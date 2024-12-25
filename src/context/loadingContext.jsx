@@ -1,3 +1,4 @@
+import LoadingPopup from '@/components/LoadingButton';
 import React, { createContext, useContext, useState } from 'react';
 
 const LoadingContext = createContext(undefined);
@@ -13,6 +14,14 @@ export function LoadingProvider({ children }) {
 
     return (
         <LoadingContext.Provider value={{ isLoading, setLoading, loadingText, setLoadingText,loadingComponent,setLoadingComponent }}>
+        {isLoading && <div className='fixed top-0 bottom-0 left-0 right-0  z-50'>
+            <LoadingPopup
+            isLoading={isLoading}
+            size="md" // Can be 'sm', 'md', or 'lg'
+            type="gif" // Can be 'spinner' or 'gif'
+            gifSrc="/img/icon_img.gif" // Path to custom GIF
+          />
+        </div>}
             {children}
         </LoadingContext.Provider>
     );

@@ -1,4 +1,4 @@
-import { useLocation, Link } from "react-router-dom";
+import { useLocation, Link, useNavigate } from "react-router-dom";
 import {
   Navbar,
   Typography,
@@ -25,27 +25,34 @@ import {
   setOpenConfigurator,
   setOpenSidenav,
 } from "@/context";
+import { IoArrowBack } from "react-icons/io5";
 
+import ProfilePic from "../../asset/ProfilePic.jpg"; // Temporary Data from Asset
+import { useAuth } from "@/context/authContext";
 export function DashboardNavbar() {
   const [controller, dispatch] = useMaterialTailwindController();
-  const { fixedNavbar, openSidenav } = controller;
+  const { fixedNavbar } = controller;
   const { pathname } = useLocation();
+  const navigate = useNavigate()
   const [layout, page] = pathname.split("/").filter((el) => el !== "");
+  const { userInfo ,pageHeading  } = useAuth()
 
+  const { openSidenav } = controller;
   return (
+
+
     <Navbar
       color={fixedNavbar ? "white" : "transparent"}
-      className={`rounded-xl transition-all ${
-        fixedNavbar
-          ? "sticky top-4 z-40 py-3 shadow-md shadow-blue-gray-500/5"
-          : "px-0 py-1"
-      }`}
+      className={`rounded-xl shadow-sm transition-all ${fixedNavbar
+        ? "sticky top-4 z-40 py-3 shadow-md shadow-blue-gray-500/5"
+        : "px-0 py-1"
+        }`}
       fullWidth
       blurred={fixedNavbar}
     >
-      <div className="flex flex-col-reverse justify-between gap-6 md:flex-row md:items-center">
+      <div className="flex items-center flex-row  lg:pl-0 justify-between gap-6 md:flex-row md:items-center">
         <div className="capitalize">
-          <Breadcrumbs
+          {/* <Breadcrumbs
             className={`bg-transparent p-0 transition-all ${
               fixedNavbar ? "mt-1" : ""
             }`}
@@ -66,18 +73,49 @@ export function DashboardNavbar() {
             >
               {page}
             </Typography>
-          </Breadcrumbs>
-          <Typography variant="h6" color="blue-gray">
-            {page}
-          </Typography>
-        </div>
-        <div className="flex items-center">
-          <div className="mr-auto md:mr-4 md:w-56">
-            <Input label="Search" />
+          </Breadcrumbs> */}
+
+          <div className="flex items-center gap lg:pl-3">
+
+            {/* Hamburger Icon */}
+            <IconButton
+              variant="text"
+              color="gray"
+              size="lg"
+              ripple={false}
+              className="xl:hidden"
+              onClick={() => setOpenSidenav(dispatch, !openSidenav)}
+            >
+              <Bars3Icon className="h-6 w-6" />
+            </IconButton>
+            {pageHeading.backURL != null && <IoArrowBack onClick={() => {
+              navigate('/home')
+            }} className="text-black text-lg cursor-pointer"  />}
+            <Typography className="md:text-lg px-3 text-sm font-bold" color="blue-gray">
+            {pageHeading.title}
+           {/* replace pages Name */}
+            </Typography>
           </div>
-          <UserCircleIcon 
-          className="h-12 w-12"
-          ></UserCircleIcon>
+
+        </div>
+
+
+
+        <div className="flex items-center">
+          {/* Search Input */}
+          {/* <div className="mr-auto md:mr-4 md:w-56">
+            <Input label="Search" />
+          </div> */}
+          <Typography variant="h6" className="italic px-3 text-gray-500" >
+
+            (  {userInfo.roll} )
+          </Typography>
+          <div onClick={() => {
+            navigate("/dashboard/profile")
+          }}>
+
+            <img src={ProfilePic} alt="" className="h-10 w-10 rounded-full cursor-pointer" />
+          </div>
           {/* <IconButton
             variant="text"
             color="blue-gray"
@@ -103,13 +141,22 @@ export function DashboardNavbar() {
               <UserCircleIcon className="h-5 w-5 text-blue-gray-500" />
             </IconButton>
           </Link> */}
-          <Menu>
-            <MenuHandler>
+          {/* <Menu> */}
+
+            {/* <MenuHandler>
               <IconButton variant="text" color="blue-gray">
                 <BellIcon className="h-5 w-5 text-blue-gray-500" />
               </IconButton>
             </MenuHandler>
             <MenuList className="w-max border-0">
+              <MenuItem>Placeholder Item</MenuItem>
+            </MenuList> */}
+            {/* <MenuHandler>
+              <IconButton variant="text" color="blue-gray">
+                <BellIcon className="h-5 w-5 text-blue-gray-500" />
+              </IconButton>
+            </MenuHandler> */}
+            {/* <MenuList className="w-max border-0">
               <MenuItem className="flex items-center gap-3">
                 <Avatar
                   src="https://demos.creative-tim.com/material-dashboard/assets/img/team-2.jpg"
@@ -179,15 +226,15 @@ export function DashboardNavbar() {
                   </Typography>
                 </div>
               </MenuItem>
-            </MenuList>
-          </Menu>
-          <IconButton
+            </MenuList> */}
+          {/* </Menu> */}
+          {/* <IconButton
             variant="text"
             color="blue-gray"
             onClick={() => setOpenConfigurator(dispatch, true)}
           >
             <Cog6ToothIcon className="h-5 w-5 text-blue-gray-500" />
-          </IconButton>
+          </IconButton> */}
         </div>
       </div>
     </Navbar>
