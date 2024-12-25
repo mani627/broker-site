@@ -1,0 +1,86 @@
+name: Deploy UI to Hostinger VPS
+
+on:
+  push:
+    branches:
+      - main
+  workflow_dispatch:
+    inputs:
+      environment:
+        description: 'Environment to deploy to'
+        required: true
+        default: 'production'
+
+jobs:
+  build-and-deploy:
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Checkout Code
+      uses: actions/checkout@v3
+
+    - name: Install Dependencies
+      run: |
+        echo "Installing dependencies..."
+        npm install --force
+
+    - name: Build Project
+      run: |
+        echo "Building the project..."
+        npm run build
+
+    - name: Setup SSH
+      run: |
+        mkdir -p ~/.ssh
+        echo "${{ secrets.HOSTINGER_KEY }}" > ~/.ssh/id_ed25519
+        chmod 600 ~/.ssh/id_ed25519
+        echo "StrictHostKeyChecking no" >> ~/.ssh/config
+
+    - name: Create and Set Permissions
+      env:
+        DEPLOY_PATH: ${{ secrets.UI_DEPLOY_PATH }}
+        SERVER_IP: ${{ secrets.HOSTINGER_IP }}
+        SERVER_USER: ${{ secrets.HOSTINGER_USER }}
+      run: |
+        ssh $SERVER_USER@$SERVER_IP "
+          sudo mkdir -p $DEPLOY_PATH/dist
+          sudo chown -R $SERVER_USER:$SERVER_USER $DEPLOY_PATH
+          ls -la $DEPLOY_PATH
+        "
+
+    - name: Deploy to Hostinger
+      env:
+        DEPLOY_PATH: ${{ secrets.UI_DEPLOY_PATH }}
+        SERVER_IP: ${{ secrets.HOSTINGER_IP }}
+        SERVER_USER: ${{ secrets.HOSTINGER_USER }}
+      run: |
+        echo "Deploying files..."
+        echo "Current directory contents:"
+        ls -la
+        echo "Dist directory contents:"
+        ls -la dist/
+        
+        # Debug the rsync command
+        echo "RSYNC Command:"
+        echo "rsync -avz --delete dist/ ${SERVER_USER}@${SERVER_IP}:${DEPLOY_PATH}/dist/"
+        
+        # Execute rsync with proper variable expansion
+        rsync -avz --delete dist/ "${SERVER_USER}@${SERVER_IP}:${DEPLOY_PATH}/dist/"
+
+    - name: Set Final Permissions
+      env:
+        DEPLOY_PATH: ${{ secrets.UI_DEPLOY_PATH }}
+        SERVER_IP: ${{ secrets.HOSTINGER_IP }}
+        SERVER_USER: ${{ secrets.HOSTINGER_USER }}
+      run: |
+        ssh $SERVER_USER@$SERVER_IP "
+          sudo chown -R $SERVER_USER:$SERVER_USER $DEPLOY_PATH
+          sudo chmod -R 755 $DEPLOY_PATH
+        "
+
+    - name: Restart Nginx
+      env:
+        SERVER_IP: ${{ secrets.HOSTINGER_IP }}
+        SERVER_USER: ${{ secrets.HOSTINGER_USER }}
+      run: |
+        ssh $SERVER_USER@$SERVER_IP "sudo systemctl reload nginx"

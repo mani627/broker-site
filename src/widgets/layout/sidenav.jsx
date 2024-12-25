@@ -115,7 +115,7 @@ export function Sidenav({ brandImg, brandName, routes }) {
 
 Sidenav.defaultProps = {
   brandImg: "/img/logo-ct.png",
-  brandName: "ShipMacha",
+  brandName: "Dispatch Go",
 };
 
 Sidenav.propTypes = {
